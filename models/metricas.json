@@ -1,0 +1,8 @@
+{
+    "modelo": "SVM",
+    "acuracia": 0.983,
+    "precisao_weighted": 0.9830040759001173,
+    "recall_weighted": 0.983,
+    "f1_weighted": 0.9829912909280121,
+    "tempo_treinamento_segundos": 362.76
+}

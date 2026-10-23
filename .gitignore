@@ -1,0 +1,17 @@
+﻿# Ambiente virtual Python
+.venv/
+venv/
+
+# Cache e arquivos temporários
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Arquivos locais de configuração
+.env
+
+# Arquivo auxiliar de diagnóstico
+dependencias_instaladas.txt
+
+# Script vazio
+mini_projeto_final.py

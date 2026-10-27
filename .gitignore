@@ -15,3 +15,7 @@ dependencias_instaladas.txt
 
 # Script vazio
 mini_projeto_final.py
+
+
+# Imagens geradas durante os testes
+imagens_teste/digito_processado.png

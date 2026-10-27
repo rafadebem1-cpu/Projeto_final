@@ -1,9 +1,10 @@
-
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, StrictInt, field_validator, ConfigDict
 
 
 class PredictionRequest(BaseModel):
-    pixels: list[int] = Field(
+    model_config = ConfigDict(extra="forbid")
+
+    pixels: list[StrictInt] = Field(
         min_length=784,
         max_length=784,
         description="Exatamente 784 pixels, cada um entre 0 e 255."
@@ -18,7 +19,7 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    predicted_digit: int = Field(
+    predicted_digit: StrictInt = Field(
         ge=0,
         le=9,
         description="Dígito previsto pelo modelo."

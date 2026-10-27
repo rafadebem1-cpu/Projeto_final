@@ -1,7 +1,9 @@
 ﻿
-fastapi
-uvicorn[standard]
+fastapi==0.159.1
+uvicorn==0.54.0
 scikit-learn==1.9.0
-numpy
-joblib
-pandas
+numpy==2.5.4
+joblib==1.6.0
+pydantic==2.14.1
+pillow==13.0.0
+python-multipart==0.0.32

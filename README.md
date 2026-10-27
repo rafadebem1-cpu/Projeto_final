@@ -1,14 +1,17 @@
+
 # API de Reconhecimento de Dígitos Manuscritos com Inteligência Artificial
 
 ## 1. Sobre o projeto
 
 Este projeto tem como objetivo desenvolver uma API para reconhecimento de dígitos manuscritos utilizando técnicas de Machine Learning.
 
-O modelo foi treinado com o conjunto de dados MNIST, composto por imagens de dígitos de 0 a 9. Cada imagem é representada por 784 pixels, correspondentes a uma imagem em escala de cinza de 28 × 28 pixels.
+O modelo foi treinado com o conjunto de dados **MNIST**, composto por imagens de dígitos de 0 a 9. Cada imagem possui dimensões de 28 × 28 pixels, totalizando 784 pixels em escala de cinza.
 
-O algoritmo escolhido foi o Support Vector Machine (SVM), que apresentou acurácia de aproximadamente 98,3% na avaliação realizada durante o treinamento.
+O algoritmo escolhido foi o **Support Vector Machine (SVM)**, que apresentou acurácia de aproximadamente **98,3%** na avaliação realizada durante o projeto.
 
 A aplicação foi desenvolvida em Python com FastAPI e permite enviar os pixels de uma imagem para obter a previsão do dígito correspondente.
+
+Além do treinamento do modelo, o projeto contempla a serialização do modelo, a validação dos dados de entrada, o desenvolvimento de uma API modular e a disponibilização de endpoints para consulta e previsão.
 
 ## 2. Tecnologias utilizadas
 
@@ -20,6 +23,9 @@ A aplicação foi desenvolvida em Python com FastAPI e permite enviar os pixels 
 - Joblib
 - Pandas
 - Pydantic
+- Pillow — para processamento de imagens, caso utilizado pelo script de teste
+
+As versões das principais dependências estão especificadas no arquivo `requirements.txt`.
 
 ## 3. Estrutura do projeto
 
@@ -40,6 +46,17 @@ Projeto_final/
 └── README.md
 ```
 
+### Responsabilidade dos arquivos
+
+- `main.py`: configura a aplicação FastAPI, carrega o modelo na inicialização e disponibiliza o endpoint de saúde.
+- `routers.py`: define as rotas da API, incluindo a rota de previsão.
+- `schemas.py`: define os esquemas de entrada e saída e as regras de validação dos dados.
+- `services.py`: realiza o pré-processamento dos pixels e executa a previsão com o modelo.
+- `models/svm_mnist.joblib`: contém o modelo SVM treinado e serializado.
+- `models/metricas.json`: armazena as métricas registradas durante a avaliação do modelo.
+- `mini_projeto_final.ipynb`: contém o notebook de desenvolvimento e experimentação do projeto.
+- `requirements.txt`: lista as dependências necessárias para executar a aplicação.
+
 ## 4. Instalação
 
 Clone o repositório e acesse a pasta do projeto:
@@ -49,7 +66,7 @@ git clone https://github.com/rafadabem1-cpu/Projeto_final.git
 cd Projeto_final
 ```
 
-Crie e ative um ambiente virtual, se ainda não tiver um.
+Crie e ative um ambiente virtual.
 
 No Windows PowerShell:
 
@@ -80,6 +97,8 @@ A documentação interativa pode ser acessada em:
 
 http://127.0.0.1:8000/docs
 
+A interface Swagger permite consultar os endpoints e realizar requisições de teste diretamente pelo navegador.
+
 ## 6. Endpoints disponíveis
 
 ### GET /health
@@ -97,9 +116,9 @@ Exemplo de resposta:
 
 ### POST /predict
 
-Recebe uma lista com exatamente 784 pixels, com valores entre 0 e 255, e retorna o dígito previsto pelo modelo.
+Recebe uma lista com exatamente 784 pixels, com valores inteiros entre 0 e 255, e retorna o dígito previsto pelo modelo.
 
-Exemplo de requisição:
+Exemplo de requisição válida, utilizando uma imagem totalmente preta:
 
 ```json
 {
@@ -107,7 +126,7 @@ Exemplo de requisição:
 }
 ```
 
-**Observação:** o exemplo acima é apenas ilustrativo. Para uma requisição válida, a lista deve conter exatamente 784 valores inteiros entre 0 e 255.
+**Importante:** o trecho acima é apenas ilustrativo e não constitui uma requisição válida. Para realizar uma previsão, a lista deve conter exatamente 784 valores inteiros entre 0 e 255.
 
 Exemplo de resposta:
 
@@ -117,36 +136,72 @@ Exemplo de resposta:
 }
 ```
 
-O dígito retornado é ilustrativo; a previsão depende dos pixels enviados.
+O resultado acima é ilustrativo. A previsão real depende dos pixels enviados.
 
-## 7. Validação dos dados
+## 7. Reconhecimento de imagens manuscritas
 
-A aplicação utiliza modelos Pydantic para validar a entrada da API.
+Além do endpoint que recebe uma lista de pixels, a API permite enviar imagens diretamente pelo endpoint `POST /predict/image`.
+
+O arquivo enviado é processado pela aplicação, convertido para escala de cinza, ajustado para o formato 28 × 28 pixels e transformado em uma lista de 784 valores. Em seguida, os pixels são normalizados e enviados ao modelo SVM para a previsão.
+
+### Como testar
+
+1. Inicie a API.
+2. Acesse `http://127.0.0.1:8000/docs`.
+3. Localize `POST /predict/image`.
+4. Clique em **Try it out** e selecione uma imagem PNG.
+5. Clique em **Execute** e confira o dígito previsto.
+
+As imagens de teste ficam armazenadas na pasta `imagens_teste/`. O desempenho depende da qualidade da imagem, da legibilidade do dígito e da semelhança entre a escrita enviada e as imagens utilizadas no treinamento.
+
+O endpoint aceita imagens PNG e JPEG. Arquivos inválidos ou imagens sem um dígito identificável são rejeitados.
+
+## 8. Validação dos dados
+
+A aplicação utiliza Pydantic para validar os dados recebidos pela API.
 
 A validação verifica se:
 
 - A lista contém exatamente 784 pixels.
+- Cada pixel é um número inteiro.
 - Cada pixel está no intervalo de 0 a 255.
-- A resposta contém um dígito entre 0 e 9.
+- Não existem campos adicionais não permitidos na requisição.
+- O dígito retornado pelo modelo está entre 0 e 9.
 
-Entradas inválidas são rejeitadas pela API com o código HTTP 422.
+Requisições que não atendem aos critérios de validação são rejeitadas com o código HTTP `422`.
 
-## 8. Modelo de Machine Learning
+Se o modelo não estiver disponível, a API pode retornar HTTP `503`. Erros inesperados durante a previsão são tratados pela aplicação com HTTP `500`.
 
-O modelo SVM treinado é armazenado no arquivo `models/svm_mnist.joblib`.
+## 9. Modelo de Machine Learning
 
-O modelo é carregado durante a inicialização da aplicação e reutilizado nas requisições, evitando carregá-lo novamente a cada previsão.
+O modelo escolhido foi o Support Vector Machine (SVM), treinado com o conjunto de dados MNIST.
 
-As métricas do treinamento estão registradas em `models/metricas.json`.
+O arquivo serializado está localizado em:
 
-A acurácia observada na avaliação foi de aproximadamente 98,3%. Esse resultado se refere à avaliação realizada com o conjunto de teste utilizado no projeto e não garante a mesma precisão para qualquer imagem enviada à API.
+`models/svm_mnist.joblib`
 
-## 9. Objetivo educacional
+O modelo é carregado durante a inicialização da aplicação e armazenado no estado da aplicação FastAPI. Dessa forma, ele pode ser reutilizado nas requisições, sem precisar ser carregado novamente a cada previsão.
 
-O projeto integra conceitos de análise de dados, Machine Learning, validação de dados, desenvolvimento de APIs e organização modular de aplicações Python.
+Antes de realizar a previsão, os valores dos pixels são normalizados para o intervalo de 0 a 1, conforme o pré-processamento utilizado no treinamento.
+
+As métricas registradas durante a avaliação estão disponíveis em:
+
+`models/metricas.json`
+
+A acurácia observada foi de aproximadamente 98,3%. Esse resultado corresponde à avaliação realizada com o conjunto de teste utilizado no projeto e não garante o mesmo desempenho para qualquer imagem enviada à API.
+
+## 10. Objetivo educacional
+
+O projeto integra conceitos de análise de dados, Machine Learning, avaliação de modelos, serialização, validação de dados, desenvolvimento de APIs e organização modular de aplicações Python.
 
 Foi desenvolvido como parte do projeto final do curso técnico de Análise de Dados e Machine Learning.
 
-## 10. Autor
+## 11. Autor
 
 Projeto acadêmico desenvolvido para fins de estudo e aplicação prática de Inteligência Artificial.
+
+## 12. Apresentação do projeto
+
+**Vídeo de demonstração:** adicionar o link do vídeo após sua publicação.
+
+O vídeo apresentará o objetivo do projeto, a execução da aplicação, os testes da API e as principais decisões técnicas adotadas durante o desenvolvimento.

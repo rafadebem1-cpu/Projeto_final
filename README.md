@@ -30,6 +30,7 @@ As versões das principais dependências estão especificadas no arquivo `requir
 ## 3. Estrutura do projeto
 
 ```text
+
 Projeto_final/
 ├── app/
 │   ├── __init__.py
@@ -37,13 +38,16 @@ Projeto_final/
 │   ├── routers.py
 │   ├── schemas.py
 │   └── services.py
+├── imagens_teste/
 ├── models/
 │   ├── svm_mnist.joblib
 │   └── metricas.json
 ├── notebooks/
 ├── mini_projeto_final.ipynb
+├── testar_imagem.py
 ├── requirements.txt
 └── README.md
+
 ```
 
 ### Responsabilidade dos arquivos
@@ -62,7 +66,7 @@ Projeto_final/
 Clone o repositório e acesse a pasta do projeto:
 
 ```bash
-git clone https://github.com/rafadabem1-cpu/Projeto_final.git
+git clone https://github.com/rafadebem1-cpu/Projeto_final.git
 cd Projeto_final
 ```
 
@@ -122,11 +126,13 @@ Exemplo de requisição válida, utilizando uma imagem totalmente preta:
 
 ```json
 {
-  "pixels": [0, 0, 0, 0]
+  "pixels": [0, 0, 0, 0, 0, 0, 0, 0]
 }
 ```
 
 **Importante:** o trecho acima é apenas ilustrativo e não constitui uma requisição válida. Para realizar uma previsão, a lista deve conter exatamente 784 valores inteiros entre 0 e 255.
+
+Para realizar uma requisição válida, envie exatamente 784 valores inteiros entre 0 e 255. Você pode gerar uma requisição de teste pelo Swagger, disponível em /docs.
 
 Exemplo de resposta:
 
@@ -142,7 +148,18 @@ O resultado acima é ilustrativo. A previsão real depende dos pixels enviados.
 
 Além do endpoint que recebe uma lista de pixels, a API permite enviar imagens diretamente pelo endpoint `POST /predict/image`.
 
+O endpoint aceita imagens PNG e JPEG. Arquivos inválidos ou imagens sem um dígito identificável são rejeitados.
+
 O arquivo enviado é processado pela aplicação, convertido para escala de cinza, ajustado para o formato 28 × 28 pixels e transformado em uma lista de 784 valores. Em seguida, os pixels são normalizados e enviados ao modelo SVM para a previsão.
+
+**Códigos de resposta HTTP**
+
+- `200 OK`: imagem processada e dígito previsto com sucesso.
+- `400 Bad Request`: arquivo vazio, imagem inválida ou nenhum dígito identificado.
+- `415 Unsupported Media Type`: arquivo enviado em formato diferente de PNG ou JPEG.
+- `503 Service Unavailable`: modelo de previsão indisponível.
+- `500 Internal Server Error`: erro inesperado durante a previsão.
+
 
 ### Como testar
 
@@ -167,6 +184,9 @@ A validação verifica se:
 - Cada pixel está no intervalo de 0 a 255.
 - Não existem campos adicionais não permitidos na requisição.
 - O dígito retornado pelo modelo está entre 0 e 9.
+- A requisição não pode conter campos adicionais além dos definidos no esquema.
+- Valores decimais, textos ou outros tipos que não sejam inteiros são rejeitados para os pixels.
+
 
 Requisições que não atendem aos critérios de validação são rejeitadas com o código HTTP `422`.
 
@@ -188,7 +208,14 @@ As métricas registradas durante a avaliação estão disponíveis em:
 
 `models/metricas.json`
 
-A acurácia observada foi de aproximadamente 98,3%. Esse resultado corresponde à avaliação realizada com o conjunto de teste utilizado no projeto e não garante o mesmo desempenho para qualquer imagem enviada à API.
+Na avaliação realizada com o conjunto de teste do MNIST, o modelo SVM apresentou os seguintes resultados:
+
+- **Acurácia:** 98,30%
+- **Precisão ponderada (Weighted Precision):** 98,30%
+- **Revocação ponderada (Weighted Recall):** 98,30%
+- **F1-score ponderado (Weighted F1-score):** 98,30%
+
+Essas métricas representam o desempenho do modelo na avaliação realizada com o conjunto de teste. O resultado não garante o mesmo desempenho para qualquer imagem manuscrita enviada à API, pois a qualidade da escrita e o processamento da imagem podem influenciar a previsão.
 
 ## 10. Objetivo educacional
 
@@ -202,6 +229,8 @@ Projeto acadêmico desenvolvido para fins de estudo e aplicação prática de In
 
 ## 12. Apresentação do projeto
 
-**Vídeo de demonstração:** adicionar o link do vídeo após sua publicação.
+**Vídeo de demonstração:** *link a ser inserido após a publicação.*
 
-O vídeo apresentará o objetivo do projeto, a execução da aplicação, os testes da API e as principais decisões técnicas adotadas durante o desenvolvimento.
+A apresentação demonstrará o objetivo do projeto, a execução da aplicação, os testes dos endpoints da API, o funcionamento do modelo SVM e as principais decisões técnicas adotadas durante o desenvolvimento.
+
+O vídeo será disponibilizado por meio de um link acessível para avaliação.

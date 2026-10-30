@@ -90,7 +90,7 @@ python -m pip install -r requirements.txt
 Na pasta raiz do projeto, execute:
 
 ```bash
-python -m uvicorn app.main:app --reload
+  python -m uvicorn app.main:app --reload
 ```
 
 Após a inicialização, a API estará disponível localmente em:
@@ -229,8 +229,6 @@ Projeto acadêmico desenvolvido para fins de estudo e aplicação prática de In
 
 ## 12. Apresentação do projeto
 
-**Vídeo de demonstração:** *link a ser inserido após a publicação.*
+**Vídeo de demonstração:** *link incluido no AVA*
 
 A apresentação demonstrará o objetivo do projeto, a execução da aplicação, os testes dos endpoints da API, o funcionamento do modelo SVM e as principais decisões técnicas adotadas durante o desenvolvimento.
-
-O vídeo será disponibilizado por meio de um link acessível para avaliação.
